@@ -42,71 +42,81 @@ static event OnPostTemplatesCreated()
 
 static function ModifyReturnFireAbilities()
 {
-	local X2AbilityTemplateManager			AllAbilities;
+	local Array<X2AbilityTemplate>			AbilityTemplates;
 	local X2AbilityTemplate					Template;
 	local X2Effect							Effect;
 	local X2Effect_CoveringFire				CoveringEffect;
 
-	AllAbilities = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
-
 	// This is the default Sharpshooter Return Fire ability
 	// Localization references secondary weapon
-	Template = AllAbilities.FindAbilityTemplate('ReturnFire');
-	foreach Template.AbilityTargetEffects(Effect)
+	FindAbilityTemplates('ReturnFire', AbilityTemplates);
+	foreach AbilityTemplates(Template)
 	{
-		CoveringEffect = X2Effect_CoveringFire(Effect);
-		if (Effect != none)
+		foreach Template.AbilityTargetEffects(Effect)
 		{
-			CoveringEffect.MaxPointsPerTurn = default.SecondaryReturnFireShots;
-			CoveringEffect.ActivationPercentChance = default.SecondaryReturnFireChance;
-			CoveringEffect.bOnlyWhenAttackMisses = (default.SecondaryReturnFireOnlyWhenMiss && !default.SecondaryReturnFirePreEmptive);
-			CoveringEffect.bPreEmptiveFire = default.SecondaryReturnFirePreEmptive;
-			break;
+			CoveringEffect = X2Effect_CoveringFire(Effect);
+			if (Effect != none)
+			{
+				CoveringEffect.MaxPointsPerTurn = default.SecondaryReturnFireShots;
+				CoveringEffect.ActivationPercentChance = default.SecondaryReturnFireChance;
+				CoveringEffect.bOnlyWhenAttackMisses = (default.SecondaryReturnFireOnlyWhenMiss && !default.SecondaryReturnFirePreEmptive);
+				CoveringEffect.bPreEmptiveFire = default.SecondaryReturnFirePreEmptive;
+				break;
+			}
 		}
 	}
 	// This is Return Fire for Skirmishers (and potentially others without pistols if added with mods)
 	// It is essentially just a copy of the Sharpshooter one but the localization can refer to the primary weapon this way
-	Template = AllAbilities.FindAbilityTemplate('SkirmisherReturnFire');
-	foreach Template.AbilityTargetEffects(Effect)
+	FindAbilityTemplates('SkirmisherReturnFire', AbilityTemplates);
+	foreach AbilityTemplates(Template)
 	{
-		CoveringEffect = X2Effect_CoveringFire(Effect);
-		if (Effect != none)
+		foreach Template.AbilityTargetEffects(Effect)
 		{
-			CoveringEffect.MaxPointsPerTurn = default.PrimaryReturnFireShots;
-			CoveringEffect.ActivationPercentChance = default.PrimaryReturnFireChance;
-			CoveringEffect.bOnlyWhenAttackMisses = (default.PrimaryReturnFireOnlyWhenMiss && !default.PrimaryReturnFirePreEmptive);
-			CoveringEffect.bPreEmptiveFire = default.PrimaryReturnFirePreEmptive;
-			break;
+			CoveringEffect = X2Effect_CoveringFire(Effect);
+			if (Effect != none)
+			{
+				CoveringEffect.MaxPointsPerTurn = default.PrimaryReturnFireShots;
+				CoveringEffect.ActivationPercentChance = default.PrimaryReturnFireChance;
+				CoveringEffect.bOnlyWhenAttackMisses = (default.PrimaryReturnFireOnlyWhenMiss && !default.PrimaryReturnFirePreEmptive);
+				CoveringEffect.bPreEmptiveFire = default.PrimaryReturnFirePreEmptive;
+				break;
+			}
 		}
 	}
 	// This is Return Fire for ADVENT when the Dark Event is active
 	// Gets way more dangerous with infinite uses
-	Template = AllAbilities.FindAbilityTemplate('DarkEventAbility_ReturnFire');
-	foreach Template.AbilityTargetEffects(Effect)
+	FindAbilityTemplates('DarkEventAbility_ReturnFire', AbilityTemplates);
+	foreach AbilityTemplates(Template)
 	{
-		CoveringEffect = X2Effect_CoveringFire(Effect);
-		if (Effect != none)
+		foreach Template.AbilityTargetEffects(Effect)
 		{
-			CoveringEffect.MaxPointsPerTurn = default.DarkEventReturnFireShots;
-			CoveringEffect.ActivationPercentChance = default.DarkEventReturnFireChance;
-			CoveringEffect.bOnlyWhenAttackMisses = (default.DarkEventReturnFireOnlyWhenMiss && !default.DarkEventReturnFirePreEmptive);
-			CoveringEffect.bPreEmptiveFire = default.DarkEventReturnFirePreEmptive;
-			break;
+			CoveringEffect = X2Effect_CoveringFire(Effect);
+			if (Effect != none)
+			{
+				CoveringEffect.MaxPointsPerTurn = default.DarkEventReturnFireShots;
+				CoveringEffect.ActivationPercentChance = default.DarkEventReturnFireChance;
+				CoveringEffect.bOnlyWhenAttackMisses = (default.DarkEventReturnFireOnlyWhenMiss && !default.DarkEventReturnFirePreEmptive);
+				CoveringEffect.bPreEmptiveFire = default.DarkEventReturnFirePreEmptive;
+				break;
+			}
 		}
 	}
 	// This is Return Fire for the Chosen
 	// It is infinite by default but can now be configured
-	Template = AllAbilities.FindAbilityTemplate('ChosenRevenge');
-	foreach Template.AbilityTargetEffects(Effect)
+	FindAbilityTemplates('ChosenRevenge', AbilityTemplates);
+	foreach AbilityTemplates(Template)
 	{
-		CoveringEffect = X2Effect_CoveringFire(Effect);
-		if (Effect != none)
+		foreach Template.AbilityTargetEffects(Effect)
 		{
-			CoveringEffect.MaxPointsPerTurn = default.ChosenReturnFireShots;
-			// Chance is already configurable through SoldierSkills
-			CoveringEffect.bOnlyWhenAttackMisses = (default.ChosenReturnFireOnlyWhenMiss && !default.ChosenReturnFirePreEmptive);
-			CoveringEffect.bPreEmptiveFire = default.ChosenReturnFirePreEmptive;
-			break;
+			CoveringEffect = X2Effect_CoveringFire(Effect);
+			if (Effect != none)
+			{
+				CoveringEffect.MaxPointsPerTurn = default.ChosenReturnFireShots;
+				// Chance is already configurable through SoldierSkills
+				CoveringEffect.bOnlyWhenAttackMisses = (default.ChosenReturnFireOnlyWhenMiss && !default.ChosenReturnFirePreEmptive);
+				CoveringEffect.bPreEmptiveFire = default.ChosenReturnFirePreEmptive;
+				break;
+			}
 		}
 	}
 }
@@ -114,32 +124,26 @@ static function ModifyReturnFireAbilities()
 
 static function ReactionFireFix()
 {
-	local X2AbilityTemplateManager			AbilityManager;
-	local X2AbilityTemplate					AbilityTemplate;
-	local X2DataTemplate					DataTemplate;
+	local Array<X2AbilityTemplate>			AbilityTemplates;
+	local Name								AbilityName;
+	local X2AbilityTemplate					Template;
 	local X2AbilityToHitCalc_StandardAim	StandardAim;
 	local X2Condition_UnitEffects			SuppressedCondition;
 	local X2Condition_UnitProperty			UnitCondition;
-	local Array<X2DataTemplate>				DataTemplates;
-	local Name								AbilityName;
-
-	AbilityManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
 
 	foreach default.ReactionFireAbilitiesToFix(AbilityName)
 	{
-		AbilityManager.FindDataTemplateAllDifficulties(AbilityName, DataTemplates);
-		foreach DataTemplates(DataTemplate)
+		FindAbilityTemplates(AbilityName, AbilityTemplates);
+		foreach AbilityTemplates(Template)
 		{
-			AbilityTemplate = X2AbilityTemplate(DataTemplate);
-
-			// Disallow crits on reaction fire
-			StandardAim = X2AbilityToHitCalc_StandardAim(AbilityTemplate.AbilityToHitCalc);
+			// Make sure these are considered reaction fire and disallow crits
+			StandardAim = X2AbilityToHitCalc_StandardAim(Template.AbilityToHitCalc);
 			if (StandardAim != none)
 			{
 				StandardAim.bReactionFire = true;
 				StandardAim.bAllowCrit = false;
 			}
-			StandardAim = X2AbilityToHitCalc_StandardAim(AbilityTemplate.AbilityToHitOwnerOnMissCalc);
+			StandardAim = X2AbilityToHitCalc_StandardAim(Template.AbilityToHitOwnerOnMissCalc);
 			if (StandardAim != none)
 			{
 				StandardAim.bReactionFire = true;
@@ -149,14 +153,14 @@ static function ReactionFireFix()
 			// Suppression removes activated Overwatch when used but doesn't prevent passive reaction fire without doing this
 			SuppressedCondition = new class'X2Condition_UnitEffects';
 			SuppressedCondition.AddExcludeEffect(class'X2Effect_Suppression'.default.EffectName, 'AA_UnitIsSuppressed');
-			AbilityTemplate.AbilityShooterConditions.AddItem(SuppressedCondition);
+			Template.AbilityShooterConditions.AddItem(SuppressedCondition);
 
 			// TODO: prevent reactions while suppressing, the above suppression check doesn't handle that
 
 			// Panic should prevent reactions
 			UnitCondition = new class'X2Condition_UnitProperty';
 			UnitCondition.ExcludePanicked = true;
-			AbilityTemplate.AbilityShooterConditions.AddItem(UnitCondition);
+			Template.AbilityShooterConditions.AddItem(UnitCondition);
 		}
 	}
 }
@@ -175,26 +179,54 @@ static function AddReturnFireToMoreWeapons()
 
 static function EnableReturnFire(Name WeaponName)
 {
-	local X2ItemTemplateManager		AllItems;
 	local X2WeaponTemplate			Template;
 	local Array<X2DataTemplate>		DifficultyTemplates;
 	local X2DataTemplate			DataTemplate;
 
-	AllItems = class'X2ItemTemplateManager'.static.GetItemTemplateManager();
-	Template = X2WeaponTemplate(AllItems.FindItemTemplate(WeaponName));
-	if (Template != none)
+	FindItemDataTemplates(WeaponName, DifficultyTemplates);
+	foreach DifficultyTemplates(DataTemplate)
 	{
-		AllItems.FindDataTemplateAllDifficulties(WeaponName, DifficultyTemplates);
-		foreach DifficultyTemplates(DataTemplate)
+		Template = X2WeaponTemplate(DataTemplate);
+		if (Template != none)
 		{
-			Template = X2WeaponTemplate(DataTemplate);
-			if (Template != none)
+			if (Template.Abilities.Find('PistolReturnFire') == -1) // Prevent duplicating if another mod already added it
 			{
-				if (Template.Abilities.Find('PistolReturnFire') == -1) // Prevent duplicating if another mod already added it
-				{
-					Template.Abilities.AddItem('PistolReturnFire');
-				}
+				Template.Abilities.AddItem('PistolReturnFire');
 			}
+		}
+	}
+}
+
+
+static function FindItemDataTemplates(Name ItemName, out Array<X2DataTemplate> Templates)
+{
+	local X2ItemTemplateManager			ItemManager;
+
+	Templates.Length = 0;
+
+	ItemManager = class'X2ItemTemplateManager'.static.GetItemTemplateManager();
+	ItemManager.FindDataTemplateAllDifficulties(ItemName, Templates);
+}
+
+
+static function FindAbilityTemplates(Name AbilityName, out Array<X2AbilityTemplate> Templates)
+{
+	local X2AbilityTemplateManager		AbilityManager;
+	local Array<X2DataTemplate>			DifficultyTemplates;
+	local X2DataTemplate				DataTemplate;
+	local X2AbilityTemplate				Template;
+
+	Templates.Length = 0;
+
+	AbilityManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
+	AbilityManager.FindDataTemplateAllDifficulties(AbilityName, DifficultyTemplates);
+
+	foreach DifficultyTemplates(DataTemplate)
+	{
+		Template = X2AbilityTemplate(DataTemplate);
+		if (Template != none)
+		{
+			Templates.AddItem(Template);
 		}
 	}
 }

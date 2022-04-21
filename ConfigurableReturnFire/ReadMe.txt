@@ -12,7 +12,7 @@ Pistols, Bullpups and Autopistols already have PistolReturnFire, this mod doesn'
 
 Additionally fixes Return Fire, Pistol Overwatch and Counterattack Bayonet attacks being able to crit and Counterattack Bayonet not having reaction fire aim penalty.
 
-Suppression and panic will now prevent all types of passive reaction attacks like they should. This includes Return Fire and all melee reaction attacks.
+Being suppressed or panicked will now prevent all types of passive reaction attacks like they should. This includes Return Fire and all melee reaction attacks.
 
 [h1]Adding Return Fire to more classes[/h1]
 Add SkirmisherReturnFire to a class to utilize PistolReturnFire added to their primary weapon. All classes use PistolReturnFire for the actual shot if it is on a weapon they have equipped. Templars should have ReturnFire instead of SkirmisherReturnFire.
@@ -29,6 +29,6 @@ If you have a custom class mod with Return Fire that is only supposed to work wi
 [h1]Notes[/h1]
 Return Fire may fail to activate sometimes but that is caused by visibility checks and how all reaction fire works. Changing this is not in the scope of this mod as it would require adding new abilities to fix for all types of return fire.
 
-Suppressing doesn't prevent other types of reaction attacks for the unit doing the suppressing. This doesn't necessarily break anything but may look odd. It is a vanilla problem with Mutons anyway so it's not like I'm introducing a bug here.
+Using Suppression doesn't prevent usage of reaction attacks while the unit is suppressing. This doesn't necessarily break anything but may look odd. It is a vanilla problem with Mutons anyway so it's not like I'm introducing a bug here.
 
 This is my first polished and actually uploaded mod. Feel free to give suggestions or ask questions in the comments. I will most likely create more mods so stay tuned.

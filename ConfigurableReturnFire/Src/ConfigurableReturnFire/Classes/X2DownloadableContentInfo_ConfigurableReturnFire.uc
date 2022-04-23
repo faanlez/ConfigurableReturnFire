@@ -11,7 +11,7 @@
 class X2DownloadableContentInfo_ConfigurableReturnFire extends X2DownloadableContentInfo
 	config(ConfigurableReturnFire);
 
-var config Int			SecondaryReturnFireShots,
+var config int			SecondaryReturnFireShots,
 						PrimaryReturnFireShots,
 						DarkEventReturnFireShots,
 						ChosenReturnFireShots,
@@ -19,7 +19,7 @@ var config Int			SecondaryReturnFireShots,
 						PrimaryReturnFireChance,
 						DarkEventReturnFireChance;
 
-var config Bool			SecondaryReturnFireOnlyWhenMiss,
+var config bool			SecondaryReturnFireOnlyWhenMiss,
 						PrimaryReturnFireOnlyWhenMiss,
 						DarkEventReturnFireOnlyWhenMiss,
 						ChosenReturnFireOnlyWhenMiss,
@@ -28,21 +28,26 @@ var config Bool			SecondaryReturnFireOnlyWhenMiss,
 						DarkEventReturnFirePreEmptive,
 						ChosenReturnFirePreEmptive;
 
-var config Array<Name>	ReturnFireWeapons,
+var config array<name>	ReturnFireWeapons,
 						ReactionFireAbilitiesToFix;
 
 
 static event OnPostTemplatesCreated()
 {
+	local name		TemplateName;
+
 	ModifyReturnFireAbilities();
-	ReactionFireFix();
+	foreach default.ReactionFireAbilitiesToFix(TemplateName)
+	{
+		CRTFixReactionFireAbility(TemplateName);
+	}
 	AddReturnFireToMoreWeapons();
 }
 
 
 static function ModifyReturnFireAbilities()
 {
-	local Array<X2AbilityTemplate>			AbilityTemplates;
+	local array<X2AbilityTemplate>			AbilityTemplates;
 	local X2AbilityTemplate					Template;
 	local X2Effect							Effect;
 	local X2Effect_CoveringFire				CoveringEffect;
@@ -122,42 +127,63 @@ static function ModifyReturnFireAbilities()
 }
 
 
-static function ReactionFireFix()
+static function CRTFixReactionFireAbility(name TemplateName)
 {
-	local Array<X2AbilityTemplate>			AbilityTemplates;
-	local Name								AbilityName;
+	local array<X2AbilityTemplate>			AbilityTemplates;
 	local X2AbilityTemplate					Template;
 	local X2AbilityToHitCalc_StandardAim	StandardAim;
-	local X2Condition_UnitEffects			SuppressedCondition;
+	local X2Condition						Condition;
+	local X2Condition_UnitEffects			EffectCondition;
 	local X2Condition_UnitProperty			UnitCondition;
+	local bool								SuppressAdded, PanicAdded;
 
-	foreach default.ReactionFireAbilitiesToFix(AbilityName)
+	FindAbilityTemplates(TemplateName, AbilityTemplates);
+	foreach AbilityTemplates(Template)
 	{
-		FindAbilityTemplates(AbilityName, AbilityTemplates);
-		foreach AbilityTemplates(Template)
+		// Make sure these are considered reaction fire and disallow crits
+		StandardAim = X2AbilityToHitCalc_StandardAim(Template.AbilityToHitCalc);
+		if (StandardAim != none)
 		{
-			// Make sure these are considered reaction fire and disallow crits
-			StandardAim = X2AbilityToHitCalc_StandardAim(Template.AbilityToHitCalc);
-			if (StandardAim != none)
+			StandardAim.bReactionFire = true;
+			StandardAim.bAllowCrit = false;
+		}
+		StandardAim = X2AbilityToHitCalc_StandardAim(Template.AbilityToHitOwnerOnMissCalc);
+		if (StandardAim != none)
+		{
+			StandardAim.bReactionFire = true;
+			StandardAim.bAllowCrit = false;
+		}
+
+		foreach Template.AbilityShooterConditions(Condition)
+		{
+			EffectCondition = X2Condition_UnitEffects(Condition);
+			if (EffectCondition != none)
 			{
-				StandardAim.bReactionFire = true;
-				StandardAim.bAllowCrit = false;
+				EffectCondition.RemoveExcludeEffect(class'X2Effect_Suppression'.default.EffectName);
+				EffectCondition.AddExcludeEffect(class'X2Effect_Suppression'.default.EffectName, 'AA_UnitIsSuppressed');
+				SuppressAdded = true;
+				continue;
 			}
-			StandardAim = X2AbilityToHitCalc_StandardAim(Template.AbilityToHitOwnerOnMissCalc);
-			if (StandardAim != none)
+
+			UnitCondition = X2Condition_UnitProperty(Condition);
+			if (UnitCondition != none)
 			{
-				StandardAim.bReactionFire = true;
-				StandardAim.bAllowCrit = false;
+				UnitCondition.ExcludePanicked = true;
+				PanicAdded = true;
 			}
+		}
 
-			// Suppression removes activated Overwatch when used but doesn't prevent passive reaction fire without doing this
-			SuppressedCondition = new class'X2Condition_UnitEffects';
-			SuppressedCondition.AddExcludeEffect(class'X2Effect_Suppression'.default.EffectName, 'AA_UnitIsSuppressed');
-			Template.AbilityShooterConditions.AddItem(SuppressedCondition);
+		if (!SuppressAdded)
+		{
+			EffectCondition = new class'X2Condition_UnitEffects';
+			EffectCondition.AddExcludeEffect(class'X2Effect_Suppression'.default.EffectName, 'AA_UnitIsSuppressed');
+			Template.AbilityShooterConditions.AddItem(EffectCondition);
+		}
 
-			// TODO: prevent reactions while suppressing, the above suppression check doesn't handle that
+		// TODO: prevent reactions while suppressing, the above suppression check doesn't handle that
 
-			// Panic should prevent reactions
+		if (!PanicAdded)
+		{
 			UnitCondition = new class'X2Condition_UnitProperty';
 			UnitCondition.ExcludePanicked = true;
 			Template.AbilityShooterConditions.AddItem(UnitCondition);
@@ -168,7 +194,7 @@ static function ReactionFireFix()
 
 static function AddReturnFireToMoreWeapons()
 {
-	local Name	WeaponName;
+	local name	WeaponName;
 
 	foreach default.ReturnFireWeapons(WeaponName)
 	{
@@ -177,10 +203,10 @@ static function AddReturnFireToMoreWeapons()
 }
 
 
-static function EnableReturnFire(Name WeaponName)
+static function EnableReturnFire(name WeaponName)
 {
 	local X2WeaponTemplate			Template;
-	local Array<X2DataTemplate>		DifficultyTemplates;
+	local array<X2DataTemplate>		DifficultyTemplates;
 	local X2DataTemplate			DataTemplate;
 
 	FindItemDataTemplates(WeaponName, DifficultyTemplates);
@@ -198,7 +224,7 @@ static function EnableReturnFire(Name WeaponName)
 }
 
 
-static function FindItemDataTemplates(Name ItemName, out Array<X2DataTemplate> Templates)
+static function FindItemDataTemplates(name ItemName, out array<X2DataTemplate> Templates)
 {
 	local X2ItemTemplateManager			ItemManager;
 
@@ -209,10 +235,10 @@ static function FindItemDataTemplates(Name ItemName, out Array<X2DataTemplate> T
 }
 
 
-static function FindAbilityTemplates(Name AbilityName, out Array<X2AbilityTemplate> Templates)
+static function FindAbilityTemplates(name AbilityName, out array<X2AbilityTemplate> Templates)
 {
 	local X2AbilityTemplateManager		AbilityManager;
-	local Array<X2DataTemplate>			DifficultyTemplates;
+	local array<X2DataTemplate>			DifficultyTemplates;
 	local X2DataTemplate				DataTemplate;
 	local X2AbilityTemplate				Template;
 
